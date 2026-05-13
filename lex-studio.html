@@ -1,0 +1,1591 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LexStudio — Sua Plataforma de Estudos Jurídicos</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0a1628;
+    --navy-mid: #122040;
+    --navy-light: #1a3060;
+    --blue: #1e4db7;
+    --blue-bright: #2563eb;
+    --blue-light: #3b82f6;
+    --accent: #c8a96e;
+    --accent-light: #e8d5a3;
+    --white: #ffffff;
+    --off-white: #f8f9fc;
+    --gray-100: #f1f3f8;
+    --gray-200: #e2e8f0;
+    --gray-400: #94a3b8;
+    --gray-600: #64748b;
+    --gray-800: #1e293b;
+    --success: #10b981;
+    --error: #ef4444;
+    --warning: #f59e0b;
+    --shadow-sm: 0 1px 3px rgba(10,22,40,0.08), 0 1px 2px rgba(10,22,40,0.06);
+    --shadow: 0 4px 16px rgba(10,22,40,0.10), 0 2px 6px rgba(10,22,40,0.08);
+    --shadow-lg: 0 16px 48px rgba(10,22,40,0.14), 0 6px 16px rgba(10,22,40,0.10);
+    --radius: 12px;
+    --radius-lg: 20px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--off-white);
+    color: var(--gray-800);
+    min-height: 100vh;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    position: fixed; top: 0; left: 0;
+    width: 260px; height: 100vh;
+    background: var(--navy);
+    display: flex; flex-direction: column;
+    z-index: 100;
+    border-right: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .sidebar-logo {
+    padding: 28px 24px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .logo-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px; font-weight: 700;
+    color: var(--white);
+    letter-spacing: -0.3px;
+  }
+
+  .logo-text span { color: var(--accent); }
+
+  .logo-sub {
+    font-size: 11px; color: var(--gray-400);
+    letter-spacing: 1.5px; text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  .sidebar-nav {
+    flex: 1; padding: 20px 12px;
+    overflow-y: auto;
+  }
+
+  .nav-label {
+    font-size: 10px; font-weight: 600;
+    color: var(--gray-400); letter-spacing: 1.8px;
+    text-transform: uppercase;
+    padding: 0 12px; margin: 16px 0 6px;
+  }
+
+  .nav-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 14px; border-radius: 10px;
+    cursor: pointer; color: rgba(255,255,255,0.65);
+    font-size: 14px; font-weight: 500;
+    transition: all 0.18s;
+    margin-bottom: 2px;
+    border: none; background: none; width: 100%; text-align: left;
+  }
+
+  .nav-item:hover { background: rgba(255,255,255,0.07); color: var(--white); }
+
+  .nav-item.active {
+    background: linear-gradient(135deg, var(--blue) 0%, var(--blue-bright) 100%);
+    color: var(--white);
+    box-shadow: 0 4px 14px rgba(30,77,183,0.4);
+  }
+
+  .nav-item svg { flex-shrink: 0; }
+
+  .sidebar-footer {
+    padding: 16px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .plan-badge {
+    background: linear-gradient(135deg, rgba(200,169,110,0.15), rgba(200,169,110,0.08));
+    border: 1px solid rgba(200,169,110,0.3);
+    border-radius: 10px; padding: 12px 14px;
+    display: flex; align-items: center; gap: 10px;
+  }
+
+  .plan-badge-icon { font-size: 18px; }
+  .plan-badge-text { font-size: 12px; color: var(--accent-light); font-weight: 500; }
+  .plan-badge-sub { font-size: 10px; color: rgba(200,169,110,0.6); margin-top: 1px; }
+
+  /* ── MAIN ── */
+  .main {
+    margin-left: 260px;
+    min-height: 100vh;
+  }
+
+  /* ── TOPBAR ── */
+  .topbar {
+    background: var(--white);
+    border-bottom: 1px solid var(--gray-200);
+    padding: 0 32px;
+    height: 64px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 50;
+  }
+
+  .topbar-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px; font-weight: 700;
+    color: var(--navy);
+  }
+
+  .topbar-actions { display: flex; align-items: center; gap: 12px; }
+
+  .avatar {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--blue), var(--blue-bright));
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-weight: 700; font-size: 14px;
+    cursor: pointer;
+  }
+
+  /* ── PAGES ── */
+  .page { display: none; padding: 32px; }
+  .page.active { display: block; }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+  }
+
+  /* ── DASHBOARD ── */
+  .dash-grid {
+    display: grid; gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    margin-bottom: 28px;
+  }
+
+  .stat-card {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    position: relative; overflow: hidden;
+  }
+
+  .stat-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  }
+
+  .stat-card.blue::before { background: linear-gradient(90deg, var(--blue), var(--blue-bright)); }
+  .stat-card.gold::before { background: linear-gradient(90deg, var(--accent), #e8c87a); }
+  .stat-card.green::before { background: linear-gradient(90deg, #10b981, #34d399); }
+  .stat-card.purple::before { background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
+
+  .stat-label { font-size: 12px; color: var(--gray-600); font-weight: 500; letter-spacing: 0.3px; margin-bottom: 8px; }
+  .stat-value { font-size: 32px; font-weight: 700; color: var(--navy); font-family: 'Playfair Display', serif; }
+  .stat-sub { font-size: 12px; color: var(--gray-400); margin-top: 4px; }
+
+  .dash-bottom { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+  @media (max-width: 900px) { .dash-bottom { grid-template-columns: 1fr; } }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px; font-weight: 700;
+    color: var(--navy); margin-bottom: 16px;
+  }
+
+  .activity-list { list-style: none; }
+  .activity-item {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--gray-100);
+  }
+  .activity-item:last-child { border-bottom: none; }
+
+  .activity-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--blue-bright); margin-top: 5px; flex-shrink: 0;
+  }
+
+  .activity-text { font-size: 13px; color: var(--gray-600); line-height: 1.5; }
+  .activity-time { font-size: 11px; color: var(--gray-400); margin-top: 2px; }
+
+  .topic-list { display: flex; flex-direction: column; gap: 10px; }
+  .topic-item { display: flex; align-items: center; gap: 12px; }
+  .topic-name { font-size: 13px; color: var(--gray-800); flex: 1; font-weight: 500; }
+  .topic-bar { flex: 2; height: 6px; background: var(--gray-100); border-radius: 99px; overflow: hidden; }
+  .topic-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--blue), var(--blue-bright)); }
+  .topic-pct { font-size: 12px; color: var(--gray-400); width: 32px; text-align: right; }
+
+  /* ── UPLOAD / IA EXPLICAR ── */
+  .upload-area {
+    border: 2px dashed var(--gray-200);
+    border-radius: var(--radius-lg);
+    padding: 48px 32px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--gray-100);
+    margin-bottom: 24px;
+  }
+
+  .upload-area:hover, .upload-area.drag { border-color: var(--blue-bright); background: rgba(37,99,235,0.04); }
+  .upload-icon { font-size: 40px; margin-bottom: 12px; }
+  .upload-title { font-size: 16px; font-weight: 600; color: var(--navy); margin-bottom: 4px; }
+  .upload-sub { font-size: 13px; color: var(--gray-400); }
+
+  .upload-area input { display: none; }
+
+  .text-input-area {
+    margin-bottom: 20px;
+  }
+
+  .text-area {
+    width: 100%;
+    min-height: 180px;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    padding: 16px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px; color: var(--gray-800);
+    resize: vertical;
+    outline: none;
+    transition: border 0.18s;
+    line-height: 1.6;
+  }
+
+  .text-area:focus { border-color: var(--blue-bright); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 12px 24px; border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px; font-weight: 600;
+    cursor: pointer; border: none;
+    transition: all 0.18s; text-decoration: none;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--blue) 0%, var(--blue-bright) 100%);
+    color: white;
+    box-shadow: 0 4px 14px rgba(30,77,183,0.35);
+  }
+
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(30,77,183,0.45); }
+
+  .btn-outline {
+    background: transparent; color: var(--blue);
+    border: 1.5px solid var(--blue-bright);
+  }
+
+  .btn-outline:hover { background: rgba(37,99,235,0.06); }
+
+  .btn-ghost {
+    background: var(--gray-100); color: var(--gray-800);
+  }
+
+  .btn-ghost:hover { background: var(--gray-200); }
+
+  .btn-success { background: var(--success); color: white; }
+  .btn-danger { background: var(--error); color: white; }
+
+  /* AI RESPONSE */
+  .ai-response {
+    background: linear-gradient(135deg, #f0f5ff 0%, #fafbff 100%);
+    border: 1px solid rgba(30,77,183,0.15);
+    border-radius: var(--radius-lg);
+    padding: 28px;
+    display: none;
+  }
+
+  .ai-response.visible { display: block; animation: fadeUp 0.4s ease; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .ai-header {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 20px; padding-bottom: 16px;
+    border-bottom: 1px solid rgba(30,77,183,0.1);
+  }
+
+  .ai-badge {
+    background: linear-gradient(135deg, var(--blue), var(--blue-bright));
+    color: white; font-size: 11px; font-weight: 600;
+    padding: 4px 10px; border-radius: 99px;
+    letter-spacing: 0.5px;
+  }
+
+  .ai-title { font-size: 16px; font-weight: 700; color: var(--navy); font-family: 'Playfair Display', serif; }
+
+  .ai-body { font-size: 14px; line-height: 1.9; color: var(--gray-800); }
+  .ai-body h3 { font-family: 'Playfair Display', serif; font-size: 16px; color: var(--navy); margin: 18px 0 8px; }
+  .ai-body p { margin-bottom: 12px; }
+  .ai-body ul { padding-left: 20px; margin-bottom: 12px; }
+  .ai-body li { margin-bottom: 6px; }
+  .ai-body .highlight {
+    background: rgba(30,77,183,0.08);
+    border-left: 3px solid var(--blue-bright);
+    padding: 12px 16px; border-radius: 0 8px 8px 0;
+    margin: 12px 0; font-style: italic;
+  }
+  .ai-body .example-box {
+    background: rgba(200,169,110,0.1); border: 1px solid rgba(200,169,110,0.3);
+    border-radius: 10px; padding: 14px 16px; margin: 12px 0;
+  }
+  .ai-body .example-box strong { color: #8a6520; font-size: 12px; letter-spacing: 0.5px; text-transform: uppercase; }
+
+  /* LOADING */
+  .loading {
+    display: none; align-items: center; gap: 12px;
+    padding: 20px; color: var(--gray-400); font-size: 14px;
+  }
+  .loading.visible { display: flex; }
+  .spinner {
+    width: 20px; height: 20px; border-radius: 50%;
+    border: 2px solid var(--gray-200);
+    border-top-color: var(--blue-bright);
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── QUESTÕES ── */
+  .quiz-setup { margin-bottom: 24px; }
+  .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-label { font-size: 12px; font-weight: 600; color: var(--gray-600); letter-spacing: 0.3px; }
+  .form-select, .form-input {
+    padding: 10px 14px; border: 1.5px solid var(--gray-200);
+    border-radius: 10px; font-family: 'DM Sans', sans-serif;
+    font-size: 14px; color: var(--gray-800);
+    outline: none; transition: border 0.18s;
+    background: white;
+  }
+  .form-select:focus, .form-input:focus { border-color: var(--blue-bright); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+
+  .quiz-card {
+    background: white; border: 1.5px solid var(--gray-200);
+    border-radius: var(--radius-lg); padding: 28px;
+    margin-bottom: 20px; display: none;
+    animation: fadeUp 0.3s ease;
+  }
+  .quiz-card.active { display: block; }
+
+  .q-number {
+    font-size: 11px; font-weight: 600; color: var(--blue-bright);
+    letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px;
+  }
+  .q-text { font-size: 16px; font-weight: 600; color: var(--navy); line-height: 1.6; margin-bottom: 20px; font-family: 'Playfair Display', serif; }
+
+  .options { display: flex; flex-direction: column; gap: 10px; }
+  .option {
+    display: flex; align-items: flex-start; gap: 14px;
+    padding: 14px 18px; border: 1.5px solid var(--gray-200);
+    border-radius: 10px; cursor: pointer; transition: all 0.18s;
+    font-size: 14px; color: var(--gray-800);
+    user-select: none;
+  }
+  .option:hover:not(.disabled) { border-color: var(--blue-bright); background: rgba(37,99,235,0.04); }
+  .option.selected { border-color: var(--blue-bright); background: rgba(37,99,235,0.07); }
+  .option.correct { border-color: var(--success); background: rgba(16,185,129,0.07); color: var(--success); font-weight: 600; }
+  .option.wrong { border-color: var(--error); background: rgba(239,68,68,0.07); color: var(--error); }
+  .option.disabled { cursor: default; }
+
+  .option-letter {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: var(--gray-100); border: 1.5px solid var(--gray-200);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; flex-shrink: 0;
+    color: var(--gray-600);
+  }
+  .option.selected .option-letter { background: var(--blue-bright); border-color: var(--blue-bright); color: white; }
+  .option.correct .option-letter { background: var(--success); border-color: var(--success); color: white; }
+  .option.wrong .option-letter { background: var(--error); border-color: var(--error); color: white; }
+
+  .q-written { width: 100%; }
+
+  .feedback-box {
+    display: none; margin-top: 16px;
+    padding: 16px; border-radius: 10px;
+  }
+  .feedback-box.visible { display: block; animation: fadeUp 0.3s ease; }
+  .feedback-box.correct { background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.25); }
+  .feedback-box.wrong { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25); }
+  .feedback-box.partial { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.25); }
+  .feedback-title { font-weight: 700; font-size: 14px; margin-bottom: 6px; }
+  .feedback-box.correct .feedback-title { color: var(--success); }
+  .feedback-box.wrong .feedback-title { color: var(--error); }
+  .feedback-box.partial .feedback-title { color: var(--warning); }
+  .feedback-text { font-size: 13px; line-height: 1.7; color: var(--gray-700); }
+
+  /* SCORE */
+  .score-display { display: none; text-align: center; padding: 40px 20px; }
+  .score-display.visible { display: block; animation: fadeUp 0.5s ease; }
+  .score-circle {
+    width: 120px; height: 120px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--blue), var(--blue-bright));
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    margin: 0 auto 20px; box-shadow: 0 8px 32px rgba(30,77,183,0.3);
+  }
+  .score-pct { font-size: 30px; font-weight: 700; color: white; font-family: 'Playfair Display', serif; }
+  .score-label { font-size: 11px; color: rgba(255,255,255,0.8); }
+  .score-message { font-size: 18px; font-weight: 700; color: var(--navy); font-family: 'Playfair Display', serif; margin-bottom: 8px; }
+  .score-sub { font-size: 14px; color: var(--gray-600); margin-bottom: 24px; }
+
+  /* ── GLOSSÁRIO / FERRAMENTAS ── */
+  .tools-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+  .tool-card {
+    background: white; border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg); padding: 24px;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .tool-card:hover { box-shadow: var(--shadow); border-color: var(--blue-bright); transform: translateY(-2px); }
+  .tool-icon { font-size: 28px; margin-bottom: 12px; }
+  .tool-title { font-size: 16px; font-weight: 700; color: var(--navy); font-family: 'Playfair Display', serif; margin-bottom: 6px; }
+  .tool-desc { font-size: 13px; color: var(--gray-600); line-height: 1.6; }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(10,22,40,0.6);
+    display: none; align-items: center; justify-content: center;
+    z-index: 1000; padding: 20px;
+    backdrop-filter: blur(4px);
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: white; border-radius: var(--radius-lg);
+    width: 100%; max-width: 680px; max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow-lg);
+    animation: modalIn 0.25s ease;
+  }
+  @keyframes modalIn { from { opacity:0; transform:scale(0.96); } to { opacity:1; transform:scale(1); } }
+  .modal-header { padding: 24px 28px 0; display: flex; justify-content: space-between; align-items: flex-start; }
+  .modal-title { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--navy); }
+  .modal-close {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: var(--gray-100); border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; color: var(--gray-600);
+    transition: background 0.15s;
+  }
+  .modal-close:hover { background: var(--gray-200); }
+  .modal-body { padding: 20px 28px 28px; }
+
+  /* CHIPS */
+  .chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 12px; border-radius: 99px;
+    font-size: 12px; font-weight: 600; letter-spacing: 0.3px;
+  }
+  .chip-blue { background: rgba(37,99,235,0.1); color: var(--blue-bright); }
+  .chip-gold { background: rgba(200,169,110,0.15); color: #8a6520; }
+  .chip-green { background: rgba(16,185,129,0.1); color: #059669; }
+
+  /* PROGRESS BAR */
+  .quiz-progress {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 20px;
+  }
+  .progress-bar {
+    flex: 1; height: 6px; background: var(--gray-100); border-radius: 99px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%; background: linear-gradient(90deg, var(--blue), var(--blue-bright));
+    border-radius: 99px; transition: width 0.4s ease;
+  }
+  .progress-text { font-size: 13px; color: var(--gray-400); white-space: nowrap; }
+
+  /* TABS */
+  .tabs { display: flex; gap: 4px; background: var(--gray-100); border-radius: 10px; padding: 4px; margin-bottom: 24px; }
+  .tab-btn {
+    flex: 1; padding: 9px 16px; border-radius: 8px; border: none;
+    font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: all 0.18s; color: var(--gray-600);
+    background: transparent;
+  }
+  .tab-btn.active { background: white; color: var(--navy); box-shadow: var(--shadow-sm); }
+
+  /* CHAT AI */
+  .chat-container { display: flex; flex-direction: column; height: 500px; }
+  .chat-messages { flex: 1; overflow-y: auto; padding: 0 0 16px; display: flex; flex-direction: column; gap: 16px; }
+  .msg { max-width: 85%; }
+  .msg-user { align-self: flex-end; }
+  .msg-ai { align-self: flex-start; }
+  .msg-bubble {
+    padding: 12px 16px; border-radius: 16px;
+    font-size: 14px; line-height: 1.7;
+  }
+  .msg-user .msg-bubble { background: linear-gradient(135deg, var(--blue), var(--blue-bright)); color: white; border-radius: 16px 16px 4px 16px; }
+  .msg-ai .msg-bubble { background: white; border: 1px solid var(--gray-200); color: var(--gray-800); border-radius: 16px 16px 16px 4px; }
+  .msg-time { font-size: 11px; color: var(--gray-400); margin-top: 4px; padding: 0 4px; }
+  .msg-user .msg-time { text-align: right; }
+
+  .chat-input-row { display: flex; gap: 10px; align-items: flex-end; padding-top: 16px; border-top: 1px solid var(--gray-100); }
+  .chat-input {
+    flex: 1; min-height: 44px; max-height: 120px;
+    border: 1.5px solid var(--gray-200); border-radius: 12px;
+    padding: 11px 16px; font-family: 'DM Sans', sans-serif; font-size: 14px;
+    resize: none; outline: none; transition: border 0.18s;
+  }
+  .chat-input:focus { border-color: var(--blue-bright); }
+  .send-btn {
+    width: 44px; height: 44px; border-radius: 12px;
+    background: linear-gradient(135deg, var(--blue), var(--blue-bright));
+    border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; transition: all 0.18s;
+    box-shadow: 0 4px 12px rgba(30,77,183,0.3);
+  }
+  .send-btn:hover { transform: scale(1.05); }
+
+  /* FLASHCARDS */
+  .flashcard-container { perspective: 1000px; width: 100%; max-width: 560px; margin: 0 auto 24px; height: 280px; cursor: pointer; }
+  .flashcard {
+    width: 100%; height: 100%; position: relative;
+    transform-style: preserve-3d; transition: transform 0.6s;
+  }
+  .flashcard.flipped { transform: rotateY(180deg); }
+  .flashcard-face {
+    position: absolute; inset: 0;
+    backface-visibility: hidden;
+    background: linear-gradient(135deg, var(--navy), var(--navy-light));
+    border-radius: var(--radius-lg);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 32px; text-align: center;
+  }
+  .flashcard-back { transform: rotateY(180deg); background: linear-gradient(135deg, var(--blue), var(--blue-bright)); }
+  .flashcard-label { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.5); margin-bottom: 12px; }
+  .flashcard-text { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 600; color: white; line-height: 1.5; }
+  .flashcard-hint { font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 16px; }
+
+  .flashcard-controls { display: flex; justify-content: center; gap: 12px; margin-bottom: 12px; }
+  .fc-counter { text-align: center; font-size: 13px; color: var(--gray-400); margin-bottom: 20px; }
+
+  /* MISC */
+  .divider { height: 1px; background: var(--gray-200); margin: 20px 0; }
+  .text-muted { color: var(--gray-400); font-size: 13px; }
+  .mt-4 { margin-top: 16px; }
+  .mt-6 { margin-top: 24px; }
+  .flex { display: flex; }
+  .gap-3 { gap: 12px; }
+  .items-center { align-items: center; }
+  .justify-between { justify-content: space-between; }
+  .w-full { width: 100%; }
+
+  .tag {
+    display: inline-block; padding: 2px 8px;
+    background: var(--gray-100); color: var(--gray-600);
+    border-radius: 6px; font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+
+  /* Scroll */
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--gray-200); border-radius: 99px; }
+
+  /* Welcome hero */
+  .hero-banner {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 50%, var(--blue) 100%);
+    border-radius: var(--radius-lg); padding: 32px 36px; margin-bottom: 24px;
+    position: relative; overflow: hidden;
+  }
+  .hero-banner::before {
+    content: '§'; position: absolute; right: -20px; top: -30px;
+    font-size: 200px; color: rgba(255,255,255,0.03);
+    font-family: 'Playfair Display', serif; font-weight: 900;
+  }
+  .hero-greeting { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 4px; }
+  .hero-title { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; color: white; margin-bottom: 8px; }
+  .hero-sub { font-size: 14px; color: rgba(255,255,255,0.65); max-width: 500px; line-height: 1.6; }
+  .hero-actions { display: flex; gap: 12px; margin-top: 20px; flex-wrap: wrap; }
+  .btn-white { background: white; color: var(--navy); box-shadow: 0 4px 14px rgba(0,0,0,0.15); }
+  .btn-white:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,0,0,0.2); }
+  .btn-ghost-white { background: rgba(255,255,255,0.12); color: white; border: 1.5px solid rgba(255,255,255,0.25); }
+  .btn-ghost-white:hover { background: rgba(255,255,255,0.2); }
+
+  .quick-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 28px; }
+  .qa-card {
+    background: white; border: 1px solid var(--gray-200); border-radius: var(--radius);
+    padding: 18px 20px; display: flex; align-items: center; gap: 14px;
+    cursor: pointer; transition: all 0.18s;
+  }
+  .qa-card:hover { border-color: var(--blue-bright); box-shadow: var(--shadow); transform: translateY(-1px); }
+  .qa-icon { width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+  .qa-icon.blue { background: rgba(37,99,235,0.1); }
+  .qa-icon.gold { background: rgba(200,169,110,0.15); }
+  .qa-icon.green { background: rgba(16,185,129,0.1); }
+  .qa-icon.purple { background: rgba(139,92,246,0.1); }
+  .qa-title { font-size: 14px; font-weight: 600; color: var(--navy); }
+  .qa-sub { font-size: 12px; color: var(--gray-400); margin-top: 1px; }
+
+  #filePreview {
+    background: var(--gray-100); border: 1px solid var(--gray-200);
+    border-radius: 10px; padding: 12px 16px; margin-bottom: 16px;
+    display: none; align-items: center; gap: 10px;
+    font-size: 13px; color: var(--gray-600);
+  }
+  #filePreview.show { display: flex; }
+
+  .explain-options { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+  .explain-opt {
+    padding: 7px 14px; border: 1.5px solid var(--gray-200); border-radius: 99px;
+    font-size: 13px; cursor: pointer; transition: all 0.15s; color: var(--gray-600);
+    font-weight: 500;
+  }
+  .explain-opt.selected { border-color: var(--blue-bright); background: rgba(37,99,235,0.07); color: var(--blue-bright); }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-text">Lex<span>Studio</span></div>
+    <div class="logo-sub">Plataforma Jurídica IA</div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-label">Principal</div>
+    <button class="nav-item active" onclick="showPage('dashboard')">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Dashboard
+    </button>
+    <button class="nav-item" onclick="showPage('explicar')">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+      IA Explicar Documento
+    </button>
+    <button class="nav-item" onclick="showPage('questoes')">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+      Questões & Simulados
+    </button>
+    <button class="nav-item" onclick="showPage('chat')">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+      Chat com Tutor IA
+    </button>
+    <div class="nav-label">Ferramentas</div>
+    <button class="nav-item" onclick="showPage('flashcards')">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="7" width="16" height="13" rx="2"/><path d="M6 7V5a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2h-2"/></svg>
+      Flashcards
+    </button>
+    <button class="nav-item" onclick="showPage('ferramentas')">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+      Mais Ferramentas
+    </button>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="plan-badge">
+      <div class="plan-badge-icon">⚖️</div>
+      <div>
+        <div class="plan-badge-text">Plano Estudante</div>
+        <div class="plan-badge-sub">Acesso completo IA</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-title" id="pageTitle">Dashboard</div>
+    <div class="topbar-actions">
+      <span class="chip chip-blue">✨ IA Ativa</span>
+      <div class="avatar">ES</div>
+    </div>
+  </header>
+
+  <!-- ══ DASHBOARD ══ -->
+  <div class="page active" id="page-dashboard">
+    <div class="hero-banner">
+      <div class="hero-greeting">Bem-vindo de volta 👋</div>
+      <div class="hero-title">Pronto para estudar Direito hoje?</div>
+      <div class="hero-sub">Sua IA está pronta para explicar documentos, criar questões e te ajudar a fixar o conteúdo para a OAB e concursos.</div>
+      <div class="hero-actions">
+        <button class="btn btn-white" onclick="showPage('explicar')">📄 Analisar Documento</button>
+        <button class="btn btn-ghost-white" onclick="showPage('questoes')">📝 Iniciar Simulado</button>
+      </div>
+    </div>
+
+    <div class="quick-actions">
+      <div class="qa-card" onclick="showPage('explicar')">
+        <div class="qa-icon blue">📋</div>
+        <div><div class="qa-title">Explicar Documento</div><div class="qa-sub">Cole ou envie um texto</div></div>
+      </div>
+      <div class="qa-card" onclick="showPage('questoes')">
+        <div class="qa-icon gold">📝</div>
+        <div><div class="qa-title">Questões OAB</div><div class="qa-sub">Simulado com gabarito</div></div>
+      </div>
+      <div class="qa-card" onclick="showPage('chat')">
+        <div class="qa-icon green">🤖</div>
+        <div><div class="qa-title">Tutor IA</div><div class="qa-sub">Tire dúvidas ao vivo</div></div>
+      </div>
+      <div class="qa-card" onclick="showPage('flashcards')">
+        <div class="qa-icon purple">🃏</div>
+        <div><div class="qa-title">Flashcards</div><div class="qa-sub">Memorize conceitos</div></div>
+      </div>
+    </div>
+
+    <div class="dash-grid">
+      <div class="stat-card blue">
+        <div class="stat-label">Documentos Analisados</div>
+        <div class="stat-value">24</div>
+        <div class="stat-sub">+3 esta semana</div>
+      </div>
+      <div class="stat-card gold">
+        <div class="stat-label">Questões Respondidas</div>
+        <div class="stat-value">187</div>
+        <div class="stat-sub">Taxa de acerto: 73%</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-label">Horas de Estudo</div>
+        <div class="stat-value">42h</div>
+        <div class="stat-sub">Meta: 60h/mês</div>
+      </div>
+      <div class="stat-card purple">
+        <div class="stat-label">Flashcards Criados</div>
+        <div class="stat-value">96</div>
+        <div class="stat-sub">12 para revisar hoje</div>
+      </div>
+    </div>
+
+    <div class="dash-bottom">
+      <div class="card" style="padding:24px">
+        <div class="section-title">Atividade Recente</div>
+        <ul class="activity-list">
+          <li class="activity-item">
+            <div class="activity-dot"></div>
+            <div><div class="activity-text">Simulado OAB — Direito Civil: <strong>8/10 questões corretas</strong></div><div class="activity-time">Hoje, 14h32</div></div>
+          </li>
+          <li class="activity-item">
+            <div class="activity-dot" style="background:#10b981"></div>
+            <div><div class="activity-text">Documento analisado: <strong>Aula sobre Contratos</strong></div><div class="activity-time">Hoje, 11h05</div></div>
+          </li>
+          <li class="activity-item">
+            <div class="activity-dot" style="background:#8b5cf6"></div>
+            <div><div class="activity-text">15 flashcards revisados — Direito Penal</div><div class="activity-time">Ontem, 20h18</div></div>
+          </li>
+          <li class="activity-item">
+            <div class="activity-dot" style="background:#c8a96e"></div>
+            <div><div class="activity-text">Plano de estudos gerado para <strong>Direito Constitucional</strong></div><div class="activity-time">Ontem, 16h40</div></div>
+          </li>
+        </ul>
+      </div>
+      <div class="card" style="padding:24px">
+        <div class="section-title">Desempenho por Área</div>
+        <div class="topic-list">
+          <div class="topic-item"><span class="topic-name">Dir. Civil</span><div class="topic-bar"><div class="topic-fill" style="width:82%"></div></div><span class="topic-pct">82%</span></div>
+          <div class="topic-item"><span class="topic-name">Dir. Constitucional</span><div class="topic-bar"><div class="topic-fill" style="width:71%"></div></div><span class="topic-pct">71%</span></div>
+          <div class="topic-item"><span class="topic-name">Dir. Penal</span><div class="topic-bar"><div class="topic-fill" style="width:65%"></div></div><span class="topic-pct">65%</span></div>
+          <div class="topic-item"><span class="topic-name">Dir. Administrativo</span><div class="topic-bar"><div class="topic-fill" style="width:58%"></div></div><span class="topic-pct">58%</span></div>
+          <div class="topic-item"><span class="topic-name">Dir. Tributário</span><div class="topic-bar"><div class="topic-fill" style="width:44%"></div></div><span class="topic-pct">44%</span></div>
+          <div class="topic-item"><span class="topic-name">Dir. Trabalhista</span><div class="topic-bar"><div class="topic-fill" style="width:73%"></div></div><span class="topic-pct">73%</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ EXPLICAR DOCUMENTO ══ -->
+  <div class="page" id="page-explicar">
+    <div style="max-width:860px">
+      <div class="flex items-center gap-3 mb-6" style="margin-bottom:24px">
+        <div>
+          <h2 class="section-title" style="margin-bottom:4px">IA Explicar Documento</h2>
+          <p class="text-muted">Cole o texto de uma aula, artigo ou lei — a IA vai explicar tudo de forma simples e detalhada.</p>
+        </div>
+      </div>
+
+      <div class="card" style="padding:28px;margin-bottom:20px">
+        <div style="font-size:13px;font-weight:600;color:var(--gray-600);margin-bottom:10px">Como prefere o conteúdo?</div>
+        <div class="explain-options">
+          <div class="explain-opt selected" onclick="selectOpt(this,'style')">📖 Didático com exemplos</div>
+          <div class="explain-opt" onclick="selectOpt(this,'style')">⚡ Resumo rápido</div>
+          <div class="explain-opt" onclick="selectOpt(this,'style')">🎓 Nível iniciante</div>
+          <div class="explain-opt" onclick="selectOpt(this,'style')">📊 Com mapa mental</div>
+          <div class="explain-opt" onclick="selectOpt(this,'style')">⚖️ Foco em provas</div>
+        </div>
+
+        <div id="filePreview">
+          <span>📎</span> <span id="fileName">arquivo.pdf</span>
+          <button onclick="clearFile()" style="margin-left:auto;background:none;border:none;cursor:pointer;color:var(--gray-400);font-size:16px">×</button>
+        </div>
+
+        <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+          <input type="file" id="fileInput" accept=".pdf,.txt,.doc,.docx" onchange="handleFile(this)">
+          <div class="upload-icon">📄</div>
+          <div class="upload-title">Arraste ou clique para enviar um arquivo</div>
+          <div class="upload-sub">Suporta PDF, TXT, DOC · ou cole o texto abaixo</div>
+        </div>
+
+        <div style="text-align:center;color:var(--gray-400);font-size:13px;margin:8px 0 16px">— ou —</div>
+
+        <div class="text-input-area">
+          <textarea class="text-area" id="docText" placeholder="Cole aqui o texto da aula, artigo de lei, ementa, doutrina ou qualquer conteúdo jurídico que deseja entender..."></textarea>
+        </div>
+
+        <div class="flex gap-3" style="flex-wrap:wrap">
+          <button class="btn btn-primary" onclick="explainDocument()">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            Analisar e Explicar
+          </button>
+          <button class="btn btn-ghost" onclick="document.getElementById('docText').value=''; clearFile()">Limpar</button>
+        </div>
+      </div>
+
+      <div class="loading" id="explainLoading">
+        <div class="spinner"></div>
+        A IA está analisando e preparando uma explicação completa...
+      </div>
+
+      <div class="ai-response" id="explainResult">
+        <div class="ai-header">
+          <div class="ai-badge">IA LexStudio</div>
+          <div class="ai-title" id="explainTitle">Análise do Documento</div>
+        </div>
+        <div class="ai-body" id="explainBody"></div>
+        <div class="divider"></div>
+        <div class="flex gap-3 mt-4" style="flex-wrap:wrap">
+          <button class="btn btn-outline" onclick="generateFlashcardsFromDoc()">🃏 Gerar Flashcards</button>
+          <button class="btn btn-outline" onclick="generateQuestionsFromDoc()">📝 Criar Questões</button>
+          <button class="btn btn-ghost" onclick="copyResult()">📋 Copiar Explicação</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ QUESTÕES ══ -->
+  <div class="page" id="page-questoes">
+    <div style="max-width:800px">
+      <div class="flex items-center justify-between" style="margin-bottom:24px">
+        <div>
+          <h2 class="section-title" style="margin-bottom:4px">Questões & Simulados</h2>
+          <p class="text-muted">Gere questões personalizadas no estilo OAB, concursos e provas.</p>
+        </div>
+      </div>
+
+      <div class="card" style="padding:24px;margin-bottom:24px" id="quizSetupCard">
+        <div class="tabs" style="margin-bottom:20px">
+          <button class="tab-btn active" onclick="switchTab(this,'tabGerar')">🎯 Gerar Questões</button>
+          <button class="tab-btn" onclick="switchTab(this,'tabPersonalizado')">✏️ Tema Personalizado</button>
+        </div>
+
+        <div id="tabGerar">
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Área do Direito</label>
+              <select class="form-select" id="qArea">
+                <option>Direito Civil</option>
+                <option>Direito Penal</option>
+                <option>Direito Constitucional</option>
+                <option>Direito Administrativo</option>
+                <option>Direito Tributário</option>
+                <option>Direito Trabalhista</option>
+                <option>Direito do Consumidor</option>
+                <option>Direito Empresarial</option>
+                <option>Processo Civil</option>
+                <option>Processo Penal</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tipo de Prova</label>
+              <select class="form-select" id="qTipo">
+                <option>OAB — Exame de Ordem</option>
+                <option>Concurso Público</option>
+                <option>Prova de Faculdade</option>
+                <option>Magistratura</option>
+                <option>Defensoria Pública</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Quantidade</label>
+              <select class="form-select" id="qQtd">
+                <option>5 questões</option>
+                <option selected>10 questões</option>
+                <option>15 questões</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Dificuldade</label>
+              <select class="form-select" id="qDif">
+                <option>Fácil</option>
+                <option selected>Médio</option>
+                <option>Difícil</option>
+                <option>Misto</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div id="tabPersonalizado" style="display:none">
+          <div class="form-group" style="margin-bottom:16px">
+            <label class="form-label">Assunto específico</label>
+            <textarea class="text-area" id="qCustomTema" style="min-height:100px" placeholder="Ex: Responsabilidade civil subjetiva e objetiva, elementos do crime, vícios do ato administrativo..."></textarea>
+          </div>
+        </div>
+
+        <div style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn btn-primary" onclick="startQuiz()">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Iniciar Simulado
+          </button>
+        </div>
+      </div>
+
+      <div id="quizArea" style="display:none">
+        <div class="quiz-progress">
+          <div class="progress-bar"><div class="progress-fill" id="qProgress" style="width:0%"></div></div>
+          <span class="progress-text" id="qProgressText">0 / 10</span>
+        </div>
+
+        <div id="quizCards"></div>
+
+        <div class="score-display" id="scoreDisplay">
+          <div class="score-circle">
+            <div class="score-pct" id="scorePct">0%</div>
+            <div class="score-label">acertos</div>
+          </div>
+          <div class="score-message" id="scoreMsg">Resultado</div>
+          <div class="score-sub" id="scoreSub"></div>
+          <div class="loading" id="studyDocLoading" style="justify-content:center">
+            <div class="spinner"></div>
+            Gerando documento de estudos personalizado...
+          </div>
+          <div class="ai-response" id="studyDocResult" style="text-align:left;margin-top:20px">
+            <div class="ai-header">
+              <div class="ai-badge">Plano de Estudo</div>
+              <div class="ai-title">Guia Personalizado para seus Erros</div>
+            </div>
+            <div class="ai-body" id="studyDocBody"></div>
+          </div>
+          <div style="display:flex;gap:12px;justify-content:center;margin-top:20px;flex-wrap:wrap">
+            <button class="btn btn-primary" onclick="resetQuiz()">🔄 Novo Simulado</button>
+            <button class="btn btn-outline" onclick="copyStudyDoc()">📋 Copiar Plano de Estudos</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ CHAT ══ -->
+  <div class="page" id="page-chat">
+    <div style="max-width:760px">
+      <h2 class="section-title" style="margin-bottom:4px">Tutor IA — Chat Jurídico</h2>
+      <p class="text-muted" style="margin-bottom:24px">Tire qualquer dúvida sobre Direito. O tutor responde com exemplos, jurisprudência e linguagem clara.</p>
+      <div class="card" style="padding:24px">
+        <div class="chat-container">
+          <div class="chat-messages" id="chatMessages">
+            <div class="msg msg-ai">
+              <div class="msg-bubble">Olá! 👋 Sou o <strong>Lex</strong>, seu tutor jurídico. Pode me perguntar sobre qualquer tema de Direito — vou explicar de forma clara, com exemplos práticos e referências relevantes para provas e a OAB. O que deseja saber?</div>
+              <div class="msg-time">agora</div>
+            </div>
+          </div>
+          <div class="chat-input-row">
+            <textarea class="chat-input" id="chatInput" placeholder="Pergunte sobre Direito Civil, Penal, Constitucional..." rows="1" onkeydown="chatKeydown(event)"></textarea>
+            <button class="send-btn" onclick="sendChat()">
+              <svg width="18" height="18" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+            </button>
+          </div>
+        </div>
+        <div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:8px">
+          <button class="explain-opt" onclick="sendQuickChat('O que é prescrição e decadência?')">Prescrição vs Decadência</button>
+          <button class="explain-opt" onclick="sendQuickChat('Explique os princípios do processo penal')">Princípios do Processo Penal</button>
+          <button class="explain-opt" onclick="sendQuickChat('O que são vícios do negócio jurídico?')">Vícios do Negócio Jurídico</button>
+          <button class="explain-opt" onclick="sendQuickChat('Como funciona o habeas corpus?')">Habeas Corpus</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ FLASHCARDS ══ -->
+  <div class="page" id="page-flashcards">
+    <div style="max-width:700px">
+      <h2 class="section-title" style="margin-bottom:4px">Flashcards Jurídicos</h2>
+      <p class="text-muted" style="margin-bottom:24px">Memorize conceitos essenciais. Clique no card para revelar a resposta.</p>
+
+      <div class="card" style="padding:24px;margin-bottom:20px">
+        <div class="tabs">
+          <button class="tab-btn active" onclick="switchTab(this,'fcTab1')">📚 Estudar</button>
+          <button class="tab-btn" onclick="switchTab(this,'fcTab2')">✨ Gerar com IA</button>
+        </div>
+
+        <div id="fcTab1">
+          <div class="fc-counter" id="fcCounter">Card 1 de 8</div>
+          <div class="flashcard-container" onclick="flipCard()">
+            <div class="flashcard" id="flashcard">
+              <div class="flashcard-face">
+                <div class="flashcard-label">Pergunta</div>
+                <div class="flashcard-text" id="fcFront">O que é o princípio da legalidade?</div>
+                <div class="flashcard-hint">Toque para ver a resposta</div>
+              </div>
+              <div class="flashcard-face flashcard-back">
+                <div class="flashcard-label">Resposta</div>
+                <div class="flashcard-text" id="fcBack" style="font-size:16px">Ninguém é obrigado a fazer ou deixar de fazer algo senão em virtude de lei (Art. 5º, II, CF). É o fundamento do Estado de Direito.</div>
+              </div>
+            </div>
+          </div>
+          <div class="flashcard-controls">
+            <button class="btn btn-ghost" onclick="prevCard()">← Anterior</button>
+            <button class="btn btn-danger" onclick="markCard('hard')" style="font-size:13px">😓 Difícil</button>
+            <button class="btn btn-success" onclick="markCard('easy')" style="font-size:13px">✓ Fácil</button>
+            <button class="btn btn-ghost" onclick="nextCard()">Próximo →</button>
+          </div>
+        </div>
+
+        <div id="fcTab2" style="display:none">
+          <div class="form-group" style="margin-bottom:16px">
+            <label class="form-label">Área para gerar flashcards</label>
+            <select class="form-select" id="fcGenArea">
+              <option>Direito Civil — Contratos</option>
+              <option>Direito Penal — Teoria do Crime</option>
+              <option>Direito Constitucional</option>
+              <option>Direito Administrativo</option>
+              <option>Processo Civil</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:16px">
+            <label class="form-label">Ou cole um texto para extrair conceitos</label>
+            <textarea class="text-area" id="fcGenText" style="min-height:100px" placeholder="Cole o texto da aula aqui..."></textarea>
+          </div>
+          <button class="btn btn-primary" onclick="generateFlashcards()">✨ Gerar Flashcards com IA</button>
+          <div class="loading" id="fcLoading" style="margin-top:12px">
+            <div class="spinner"></div>Gerando flashcards...
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ FERRAMENTAS ══ -->
+  <div class="page" id="page-ferramentas">
+    <h2 class="section-title" style="margin-bottom:4px">Mais Ferramentas</h2>
+    <p class="text-muted" style="margin-bottom:24px">Recursos adicionais para potencializar seus estudos jurídicos.</p>
+
+    <div class="tools-grid">
+      <div class="tool-card" onclick="openTool('resumo')">
+        <div class="tool-icon">📃</div>
+        <div class="tool-title">Gerador de Resumos</div>
+        <div class="tool-desc">Cole qualquer texto jurídico e a IA gera um resumo estruturado e organizado por tópicos.</div>
+      </div>
+      <div class="tool-card" onclick="openTool('cronograma')">
+        <div class="tool-icon">📅</div>
+        <div class="tool-title">Cronograma de Estudos</div>
+        <div class="tool-desc">Informe sua prova e disponibilidade. A IA cria um plano de estudos personalizado e otimizado.</div>
+      </div>
+      <div class="tool-card" onclick="openTool('comparar')">
+        <div class="tool-icon">⚖️</div>
+        <div class="tool-title">Comparar Institutos</div>
+        <div class="tool-desc">Compare dois institutos jurídicos lado a lado com diferenças, semelhanças e exemplos práticos.</div>
+      </div>
+      <div class="tool-card" onclick="openTool('peticao')">
+        <div class="tool-icon">📝</div>
+        <div class="tool-title">Modelo de Peça</div>
+        <div class="tool-desc">Gere modelos básicos de petições, recursos e pareceres para fins de estudo e prática.</div>
+      </div>
+      <div class="tool-card" onclick="openTool('jurisprudencia')">
+        <div class="tool-icon">🏛️</div>
+        <div class="tool-title">Explicar Jurisprudência</div>
+        <div class="tool-desc">Cole uma súmula ou ementa de acórdão e receba uma explicação clara e contextualizada.</div>
+      </div>
+      <div class="tool-card" onclick="openTool('glossario')">
+        <div class="tool-icon">📖</div>
+        <div class="tool-title">Glossário Jurídico</div>
+        <div class="tool-desc">Pesquise termos jurídicos em latim e português com definições detalhadas e exemplos práticos.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL FERRAMENTAS -->
+<div class="modal-overlay" id="toolModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="toolModalTitle">Ferramenta</div>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body" id="toolModalBody"></div>
+  </div>
+</div>
+
+<script>
+const API_URL = "https://api.anthropic.com/v1/messages";
+
+async function callAI(prompt, system) {
+  const res = await fetch(API_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 1500,
+      system: system || "Você é um tutor jurídico expert, didático e claro.",
+      messages: [{ role: "user", content: prompt }]
+    })
+  });
+  const data = await res.json();
+  return data.content?.[0]?.text || "Não foi possível obter resposta.";
+}
+
+// ── NAV ──
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  event?.currentTarget?.classList.add('active');
+  const titles = { dashboard: 'Dashboard', explicar: 'IA Explicar Documento', questoes: 'Questões & Simulados', chat: 'Chat com Tutor IA', flashcards: 'Flashcards', ferramentas: 'Mais Ferramentas' };
+  document.getElementById('pageTitle').textContent = titles[id] || '';
+}
+
+function selectOpt(el, group) {
+  el.closest('.explain-options, .card')?.querySelectorAll('.explain-opt').forEach(o => {
+    if (o.closest('.explain-options') === el.closest('.explain-options')) o.classList.remove('selected');
+  });
+  el.classList.add('selected');
+}
+
+function switchTab(btn, tabId) {
+  btn.closest('.card, .modal-body')?.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const parent = btn.closest('.card, .modal-body');
+  ['tabGerar','tabPersonalizado','fcTab1','fcTab2'].forEach(id => { const el = document.getElementById(id); if(el && parent.contains(el)) el.style.display = 'none'; });
+  const target = document.getElementById(tabId);
+  if (target) target.style.display = 'block';
+}
+
+// ── FILE ──
+function handleFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+  document.getElementById('fileName').textContent = file.name;
+  document.getElementById('filePreview').classList.add('show');
+  const reader = new FileReader();
+  reader.onload = e => { document.getElementById('docText').value = e.target.result; };
+  reader.readAsText(file);
+}
+function clearFile() {
+  document.getElementById('fileInput').value = '';
+  document.getElementById('filePreview').classList.remove('show');
+}
+
+// ── EXPLICAR ──
+async function explainDocument() {
+  const text = document.getElementById('docText').value.trim();
+  if (!text) { alert('Por favor, insira ou cole um texto para análise.'); return; }
+  const style = document.querySelector('.explain-opt.selected')?.textContent || 'Didático com exemplos';
+
+  document.getElementById('explainLoading').classList.add('visible');
+  document.getElementById('explainResult').classList.remove('visible');
+
+  const sys = `Você é o LexStudio AI, um tutor jurídico extraordinariamente didático. Explique conteúdos jurídicos de forma clara, acessível e completa. Use linguagem simples sem perder a precisão técnica. Estruture com títulos (###), use exemplos práticos do cotidiano, analogias criativas, destaques importantes com blocos especiais. Responda sempre em português brasileiro.`;
+
+  const prompt = `Analise e explique o seguinte conteúdo jurídico com o estilo: ${style}. Seja MUITO detalhado, use exemplos concretos, cite artigos de lei relevantes quando aplicável, e ao final faça um resumo dos pontos-chave.\n\nCONTEÚDO:\n${text.substring(0, 3000)}`;
+
+  try {
+    const result = await callAI(prompt, sys);
+    document.getElementById('explainBody').innerHTML = formatAIText(result);
+    document.getElementById('explainTitle').textContent = 'Análise Completa';
+    document.getElementById('explainResult').classList.add('visible');
+  } catch(e) {
+    alert('Erro ao chamar a IA. Verifique sua conexão.');
+  }
+  document.getElementById('explainLoading').classList.remove('visible');
+}
+
+function formatAIText(text) {
+  return text
+    .replace(/###\s*(.+)/g, '<h3>$1</h3>')
+    .replace(/##\s*(.+)/g, '<h3>$1</h3>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/> (.+)/g, '<div class="highlight">$1</div>')
+    .replace(/💡 (.+)/g, '<div class="example-box"><strong>💡 Exemplo</strong><br>$1</div>')
+    .replace(/\n\n/g, '</p><p>')
+    .replace(/^/, '<p>').replace(/$/, '</p>')
+    .replace(/<p><h3>/g, '<h3>').replace(/<\/h3><\/p>/g, '</h3>');
+}
+
+function copyResult() {
+  const text = document.getElementById('explainBody').innerText;
+  navigator.clipboard.writeText(text).then(() => alert('Explicação copiada!'));
+}
+
+// ── QUIZ ──
+let quizData = [];
+let currentQ = 0;
+let score = 0;
+let wrongTopics = [];
+let activeTab = 'tabGerar';
+
+function switchTab(btn, tabId) {
+  const parent = btn.closest('.card, .modal-body');
+  btn.closest('[class]').querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (tabId === 'tabGerar' || tabId === 'tabPersonalizado') {
+    document.getElementById('tabGerar').style.display = tabId === 'tabGerar' ? 'block' : 'none';
+    document.getElementById('tabPersonalizado').style.display = tabId === 'tabPersonalizado' ? 'block' : 'none';
+    activeTab = tabId;
+  } else if (tabId === 'fcTab1' || tabId === 'fcTab2') {
+    document.getElementById('fcTab1').style.display = tabId === 'fcTab1' ? 'block' : 'none';
+    document.getElementById('fcTab2').style.display = tabId === 'fcTab2' ? 'block' : 'none';
+  }
+}
+
+async function startQuiz() {
+  const area = document.getElementById('qArea').value;
+  const tipo = document.getElementById('qTipo').value;
+  const qtd = parseInt(document.getElementById('qQtd').value);
+  const dif = document.getElementById('qDif').value;
+  const custom = document.getElementById('qCustomTema')?.value;
+  const tema = (activeTab === 'tabPersonalizado' && custom) ? custom : `${area}`;
+
+  document.getElementById('quizSetupCard').style.display = 'none';
+  document.getElementById('quizArea').style.display = 'block';
+  document.getElementById('quizCards').innerHTML = '<div class="loading visible" style="justify-content:center"><div class="spinner"></div>Gerando questões com IA...</div>';
+
+  const sys = `Você é um gerador de questões jurídicas para ${tipo}. Crie questões precisas, realistas e bem elaboradas no estilo de provas reais. Responda APENAS com JSON válido, sem texto fora do JSON.`;
+  const prompt = `Gere ${qtd} questões de ${tema} com dificuldade ${dif} no estilo ${tipo}. Misture múltipla escolha (type: "multipla") e dissertativas (type: "escrita"). Para múltipla escolha inclua 4 opções. Formato JSON:
+[{"id":1,"type":"multipla","question":"...","options":["A) ...","B) ...","C) ...","D) ..."],"correct":0,"explanation":"Explicação detalhada por que a alternativa correta é essa e por que as outras estão erradas.","topic":"${tema}"},
+{"id":2,"type":"escrita","question":"...","keyPoints":["ponto1","ponto2","ponto3"],"modelAnswer":"Resposta modelo completa.","topic":"${tema}"}]
+Retorne apenas o JSON, sem markdown.`;
+
+  try {
+    const result = await callAI(prompt, sys);
+    const clean = result.replace(/```json|```/g, '').trim();
+    quizData = JSON.parse(clean);
+    currentQ = 0; score = 0; wrongTopics = [];
+    renderQuestion();
+  } catch(e) {
+    document.getElementById('quizCards').innerHTML = '<p style="color:var(--error);padding:20px">Erro ao gerar questões. Tente novamente.</p>';
+    document.getElementById('quizSetupCard').style.display = 'block';
+  }
+}
+
+function renderQuestion() {
+  if (currentQ >= quizData.length) { showScore(); return; }
+  const q = quizData[currentQ];
+  const pct = (currentQ / quizData.length) * 100;
+  document.getElementById('qProgress').style.width = pct + '%';
+  document.getElementById('qProgressText').textContent = `${currentQ} / ${quizData.length}`;
+
+  let html = `<div class="quiz-card active">
+    <div class="q-number">Questão ${currentQ + 1} de ${quizData.length} · <span class="tag">${q.topic || 'Direito'}</span></div>
+    <div class="q-text">${q.question}</div>`;
+
+  if (q.type === 'multipla') {
+    html += `<div class="options">`;
+    const letters = ['A','B','C','D'];
+    q.options?.forEach((opt, i) => {
+      html += `<div class="option" onclick="selectOption(this,${i})" data-index="${i}">
+        <div class="option-letter">${letters[i]}</div><span>${opt}</span></div>`;
+    });
+    html += `</div>`;
+  } else {
+    html += `<textarea class="text-area q-written" id="writtenAnswer" style="min-height:120px" placeholder="Escreva sua resposta aqui..."></textarea>`;
+  }
+
+  html += `<div class="feedback-box" id="feedbackBox"></div>
+    <div style="margin-top:16px;display:flex;gap:10px" id="qActions">`;
+
+  if (q.type === 'multipla') {
+    html += `<button class="btn btn-primary" onclick="confirmMultipla()">Confirmar Resposta</button>`;
+  } else {
+    html += `<button class="btn btn-primary" onclick="submitWritten()">Enviar Resposta</button>`;
+  }
+  html += `</div></div>`;
+  document.getElementById('quizCards').innerHTML = html;
+}
+
+function selectOption(el, idx) {
+  document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  el.dataset.selected = idx;
+}
+
+function confirmMultipla() {
+  const selected = document.querySelector('.option.selected');
+  if (!selected) { alert('Selecione uma alternativa.'); return; }
+  const idx = parseInt(selected.dataset.index);
+  const q = quizData[currentQ];
+  const correct = q.correct;
+  const isCorrect = idx === correct;
+
+  document.querySelectorAll('.option').forEach((o, i) => {
+    o.classList.add('disabled');
+    if (i === correct) o.classList.add('correct');
+    else if (i === idx && !isCorrect) o.classList.add('wrong');
+  });
+
+  if (isCorrect) score++;
+  else wrongTopics.push(q.topic || q.question.substring(0, 60));
+
+  showFeedback(isCorrect, q.explanation);
+  nextButton();
+}
+
+async function submitWritten() {
+  const answer = document.getElementById('writtenAnswer')?.value.trim();
+  if (!answer) { alert('Por favor, escreva sua resposta.'); return; }
+  const q = quizData[currentQ];
+  document.getElementById('qActions').innerHTML = '<div class="loading visible"><div class="spinner"></div>Avaliando resposta...</div>';
+
+  const sys = 'Você é um professor de direito avaliando respostas de alunos. Seja construtivo e didático.';
+  const prompt = `Pergunta: "${q.question}"\nPontos-chave esperados: ${q.keyPoints?.join(', ')}\nResposta do aluno: "${answer}"\n\nAvalie de 0-10, aponte o que está certo, o que falta e dê a resposta modelo. Responda em JSON: {"nota":7,"certo":"...","falta":"...","modelo":"..."}`;
+
+  try {
+    const res = await callAI(prompt, sys);
+    const clean = res.replace(/```json|```/g, '').trim();
+    const eval_ = JSON.parse(clean);
+    const isGood = eval_.nota >= 6;
+    if (isGood) score++;
+    else wrongTopics.push(q.topic || q.question.substring(0, 60));
+
+    const fb = document.getElementById('feedbackBox');
+    fb.className = `feedback-box visible ${isGood ? 'correct' : eval_.nota >= 4 ? 'partial' : 'wrong'}`;
+    fb.innerHTML = `<div class="feedback-title">${isGood ? '✅' : eval_.nota >= 4 ? '⚠️' : '❌'} Nota: ${eval_.nota}/10</div>
+      <div class="feedback-text"><strong>O que você acertou:</strong> ${eval_.certo}<br><br>
+      <strong>O que faltou:</strong> ${eval_.falta}<br><br>
+      <strong>Resposta modelo:</strong> ${eval_.modelo}</div>`;
+    nextButton();
+  } catch(e) {
+    document.getElementById('qActions').innerHTML = '<button class="btn btn-primary" onclick="submitWritten()">Tentar Avaliar Novamente</button>';
+  }
+}
+
+function showFeedback(correct, explanation) {
+  const fb = document.getElementById('feedbackBox');
+  fb.className = `feedback-box visible ${correct ? 'correct' : 'wrong'}`;
+  fb.innerHTML = `<div class="feedback-title">${correct ? '✅ Correto!' : '❌ Incorreto'}</div>
+    <div class="feedback-text">${explanation || ''}</div>`;
+}
+
+function nextButton() {
+  const isLast = currentQ >= quizData.length - 1;
+  document.getElementById('qActions').innerHTML =
+    `<button class="btn btn-primary" onclick="nextQuestion()">${isLast ? '🏆 Ver Resultado' : 'Próxima →'}</button>`;
+}
+
+function nextQuestion() {
+  currentQ++;
+  if (currentQ >= quizData.length) showScore();
+  else renderQuestion();
+}
+
+async function showScore() {
+  document.getElementById('quizCards').innerHTML = '';
+  const total = quizData.length;
+  const pct = Math.round((score / total) * 100);
+  document.getElementById('qProgress').style.width = '100%';
+  document.getElementById('qProgressText').textContent = `${total} / ${total}`;
+  document.getElementById('scorePct').textContent = pct + '%';
+
+  let msg = pct >= 80 ? '🏆 Excelente desempenho!' : pct >= 60 ? '👍 Bom resultado!' : '📚 Continue estudando!';
+  let sub = `Você acertou ${score} de ${total} questões.`;
+  document.getElementById('scoreMsg').textContent = msg;
+  document.getElementById('scoreSub').textContent = sub;
+  document.getElementById('scoreDisplay').classList.add('visible');
+
+  if (wrongTopics.length > 0) {
+    document.getElementById('studyDocLoading').classList.add('visible');
+    const sys = 'Você é um pedagogo jurídico. Crie planos de estudo concisos e eficazes.';
+    const prompt = `O aluno errou questões sobre: ${[...new Set(wrongTopics)].join(', ')}. Crie um plano de estudo personalizado com: 1) resumo dos pontos de fraqueza, 2) conceitos essenciais a revisar para cada tema, 3) dicas práticas e 4) exercícios recomendados. Seja objetivo e use markdown com ###.`;
+    try {
+      const result = await callAI(prompt, sys);
+      document.getElementById('studyDocBody').innerHTML = formatAIText(result);
+      document.getElementById('studyDocResult').classList.add('visible');
+    } catch(e) {}
+    document.getElementById('studyDocLoading').classList.remove('visible');
+  }
+}
+
+function resetQuiz() {
+  document.getElementById('scoreDisplay').classList.remove('visible');
+  document.getElementById('studyDocResult').classList.remove('visible');
+  document.getElementById('quizArea').style.display = 'none';
+  document.getElementById('quizSetupCard').style.display = 'block';
+}
+
+function copyStudyDoc() {
+  navigator.clipboard.writeText(document.getElementById('studyDocBody').innerText).then(() => alert('Plano copiado!'));
+}
+
+// ── CHAT ──
+const chatHistory = [];
+
+async function sendChat() {
+  const input = document.getElementById('chatInput');
+  const msg = input.value.trim();
+  if (!msg) return;
+  input.value = '';
+  addMessage('user', msg);
+  addMessage('ai', '...');
+
+  const sys = `Você é Lex, um tutor jurídico brilhante e didático. Responda perguntas jurídicas de forma clara, com exemplos práticos, referências a artigos de lei e jurisprudência relevante. Use linguagem acessível mas precisa. Seja educativo e encoraje o estudo.`;
+
+  chatHistory.push({ role: 'user', content: msg });
+
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514', max_tokens: 1000,
+        system: sys, messages: chatHistory
+      })
+    });
+    const data = await res.json();
+    const reply = data.content?.[0]?.text || 'Não obtive resposta.';
+    chatHistory.push({ role: 'assistant', content: reply });
+    updateLastMessage(reply);
+  } catch(e) {
+    updateLastMessage('Erro ao conectar. Tente novamente.');
+  }
+}
+
+function addMessage(role, text) {
+  const msgs = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = `msg msg-${role}`;
+  div.innerHTML = `<div class="msg-bubble">${text}</div><div class="msg-time">${new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}</div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function updateLastMessage(text) {
+  const msgs = document.getElementById('chatMessages');
+  const last = msgs.querySelector('.msg-ai:last-child .msg-bubble');
+  if (last) last.innerHTML = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+}
+
+function chatKeydown(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); } }
+
+function sendQuickChat(text) {
+  document.getElementById('chatInput').value = text;
+  sendChat();
+}
+
+// ── FLASHCARDS ──
+const fcData = [
+  { front: 'O que é o princípio da legalidade?', back: 'Ninguém é obrigado a fazer ou deixar de fazer algo senão em virtude de lei (Art. 5º, II, CF/88). Fundamento do Estado Democrático de Direito.' },
+  { front: 'Qual a diferença entre dolo direto e dolo eventual?', back: 'Dolo direto: o agente quer o resultado. Dolo eventual: o agente não quer, mas assume o risco de produzi-lo (Art. 18, I, CP).' },
+  { front: 'O que é capacidade civil plena?', back: 'É a aptidão para exercer pessoalmente todos os atos da vida civil. Adquirida aos 18 anos ou pela emancipação (Art. 5º, CC).' },
+  { front: 'O que é o princípio do contraditório?', back: 'Garantia às partes de conhecer e reagir a todos os atos processuais do adversário e decisões judiciais. Previsto no Art. 5º, LV, CF/88.' },
+  { front: 'Defina prescrição no direito civil.', back: 'É a extinção da pretensão pelo não exercício no prazo legal. Difere da decadência: enquanto esta extingue o direito, a prescrição extingue apenas a pretensão.' },
+  { front: 'O que é vício redibitório?', back: 'Defeito oculto em coisa recebida em contrato comutativo que a torna imprópria ao uso ou diminui seu valor, permitindo ao adquirente rejeitar a coisa ou pedir abatimento no preço (Art. 441, CC).' },
+  { front: 'O que é habeas corpus?', back: 'Remédio constitucional que protege o direito de locomoção. Cabe sempre que alguém sofrer ou se achar ameaçado de sofrer violência ou coação ilegal em sua liberdade de ir e vir (Art. 5º, LXVIII, CF).' },
+  { front: 'Defina ato administrativo vinculado.', back: 'Ato em que a Administração não possui margem de discricionariedade: todos os elementos estão previamente definidos em lei, devendo o agente apenas verificar se os requisitos legais foram cumpridos.' }
+];
+let fcIndex = 0;
+
+function flipCard() { document.getElementById('flashcard').classList.toggle('flipped'); }
+
+function updateFC() {
+  const fc = fcData[fcIndex];
+  document.getElementById('fcFront').textContent = fc.front;
+  document.getElementById('fcBack').textContent = fc.back;
+  document.getElementById('fcCounter').textContent = `Card ${fcIndex + 1} de ${fcData.length}`;
+  document.getElementById('flashcard').classList.remove('flipped');
+}
+
+function nextCard() { fcIndex = (fcIndex + 1) % fcData.length; updateFC(); }
+function prevCard() { fcIndex = (fcIndex - 1 + fcData.length) % fcData.length; updateFC(); }
+function markCard(level) { nextCard(); }
+
+async function generateFlashcards() {
+  const area = document.getElementById('fcGenArea').value;
+  const text = document.getElementById('fcGenText').value;
+  const tema = text.trim() ? text.substring(0, 2000) : area;
+
+  document.getElementById('fcLoading').classList.add('visible');
+  const sys = 'Gere flashcards jurídicos. Responda apenas com JSON válido.';
+  const prompt = `Gere 6 flashcards sobre: ${tema}. Formato: [{"front":"Pergunta?","back":"Resposta completa."}]. Apenas JSON.`;
+
+  try {
+    const res = await callAI(prompt, sys);
+    const clean = res.replace(/```json|```/g, '').trim();
+    const cards = JSON.parse(clean);
+    cards.forEach(c => fcData.push(c));
+    fcIndex = fcData.length - cards.length;
+    updateFC();
+    document.getElementById('fcTab1').style.display = 'block';
+    document.getElementById('fcTab2').style.display = 'none';
+    document.querySelectorAll('#page-flashcards .tab-btn').forEach((b,i) => b.classList.toggle('active', i===0));
+    alert(`✅ ${cards.length} novos flashcards adicionados!`);
+  } catch(e) { alert('Erro ao gerar flashcards.'); }
+  document.getElementById('fcLoading').classList.remove('visible');
+}
+
+// ── FERRAMENTAS MODAL ──
+const toolConfigs = {
+  resumo: { title: '📃 Gerador de Resumos', placeholder: 'Cole o texto jurídico para resumir...', btn: 'Gerar Resumo', sys: 'Você é um especialista em síntese jurídica.', prompt: text => `Faça um resumo estruturado e didático do seguinte conteúdo jurídico, use ### para títulos, destaque os pontos mais importantes para provas:\n\n${text}` },
+  comparar: { title: '⚖️ Comparar Institutos', placeholder: 'Ex: "responsabilidade subjetiva vs objetiva" ou "dolo vs culpa"...', btn: 'Comparar', sys: 'Você é um professor de direito comparado.', prompt: text => `Compare os seguintes institutos jurídicos de forma didática, criando uma tabela comparativa com diferenças, semelhanças, exemplos e aplicação prática: ${text}` },
+  jurisprudencia: { title: '🏛️ Explicar Jurisprudência', placeholder: 'Cole a súmula, ementa ou número do julgado...', btn: 'Explicar', sys: 'Você é especialista em jurisprudência brasileira.', prompt: text => `Explique de forma clara e didática a seguinte súmula/jurisprudência, incluindo: o que diz, por que foi editada, quando se aplica e exemplos práticos:\n\n${text}` },
+  glossario: { title: '📖 Glossário Jurídico', placeholder: 'Digite um termo jurídico (ex: "habeas data", "in dubio pro reo", "ultra vires")...', btn: 'Definir', sys: 'Você é um dicionário jurídico expert.', prompt: text => `Defina o termo jurídico "${text}" de forma completa: origem, significado, aplicação no direito brasileiro, exemplos práticos e artigos de lei relacionados.` },
+  peticao: { title: '📝 Modelo de Peça', placeholder: 'Descreva a peça: ex: "recurso de apelação cível por danos morais"...', btn: 'Gerar Modelo', sys: 'Você é um advogado expert em petições.', prompt: text => `Crie um modelo estruturado (com marcadores de preenchimento em [COLCHETES]) para fins de estudo: ${text}. Inclua cabeçalho, qualificação das partes, fatos, fundamentos jurídicos e pedido.` },
+  cronograma: { title: '📅 Cronograma de Estudos', placeholder: 'Ex: "OAB em 3 meses, disponho de 4h/dia, foco em civil e penal"...', btn: 'Criar Cronograma', sys: 'Você é um pedagogo especialista em concursos jurídicos.', prompt: text => `Crie um cronograma de estudos detalhado e realista baseado nas seguintes informações: ${text}. Inclua distribuição semanal por matéria, técnicas de estudo recomendadas e marcos de revisão.` }
+};
+
+function openTool(id) {
+  const cfg = toolConfigs[id];
+  document.getElementById('toolModalTitle').textContent = cfg.title;
+  document.getElementById('toolModalBody').innerHTML = `
+    <textarea class="text-area" id="toolInput" style="min-height:120px;margin-bottom:16px" placeholder="${cfg.placeholder}"></textarea>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn btn-primary" onclick="runTool('${id}')">${cfg.btn}</button>
+    </div>
+    <div class="loading" id="toolLoading" style="margin-top:12px"><div class="spinner"></div>Processando...</div>
+    <div class="ai-response" id="toolResult" style="margin-top:16px">
+      <div class="ai-header"><div class="ai-badge">IA LexStudio</div><div class="ai-title">Resultado</div></div>
+      <div class="ai-body" id="toolResultBody"></div>
+    </div>`;
+  document.getElementById('toolModal').classList.add('open');
+}
+
+async function runTool(id) {
+  const text = document.getElementById('toolInput').value.trim();
+  if (!text) { alert('Preencha o campo.'); return; }
+  const cfg = toolConfigs[id];
+  document.getElementById('toolLoading').classList.add('visible');
+  document.getElementById('toolResult').classList.remove('visible');
+
+  try {
+    const result = await callAI(cfg.prompt(text), cfg.sys);
+    document.getElementById('toolResultBody').innerHTML = formatAIText(result);
+    document.getElementById('toolResult').classList.add('visible');
+  } catch(e) { alert('Erro ao processar.'); }
+  document.getElementById('toolLoading').classList.remove('visible');
+}
+
+function closeModal() { document.getElementById('toolModal').classList.remove('open'); }
+
+async function generateFlashcardsFromDoc() {
+  const text = document.getElementById('docText').value;
+  if (!text) return;
+  showPage('flashcards');
+  document.getElementById('fcGenText').value = text;
+  generateFlashcards();
+}
+
+function generateQuestionsFromDoc() {
+  const text = document.getElementById('docText').value;
+  showPage('questoes');
+  if (text) {
+    document.getElementById('qCustomTema').value = text.substring(0, 500) + '...';
+  }
+}
+
+document.getElementById('toolModal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+
+// Drag & drop
+const ua = document.getElementById('uploadArea');
+ua?.addEventListener('dragover', e => { e.preventDefault(); ua.classList.add('drag'); });
+ua?.addEventListener('dragleave', () => ua.classList.remove('drag'));
+ua?.addEventListener('drop', e => { e.preventDefault(); ua.classList.remove('drag'); const f = e.dataTransfer.files[0]; if(f){ document.getElementById('fileInput').files = e.dataTransfer.files; handleFile({files:[f]}); } });
+</script>
+</body>
+</html>
